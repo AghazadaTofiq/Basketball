@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using TMPro;
 
 public class BallControl : MonoBehaviour
 {
@@ -9,11 +10,19 @@ public class BallControl : MonoBehaviour
     [SerializeField] private Transform DestinationPoint;
     [SerializeField] private Transform ArmsLeft;
     [SerializeField] private Transform PlayerLeft;
+    [SerializeField] private Transform PlayerLeftPrefab;
     [SerializeField] private Transform BallInHandsRight;
     [SerializeField] private Transform BallOverHeadRight;
     [SerializeField] private Transform ArmsRight;
     [SerializeField] private Transform PlayerRight;
+    [SerializeField] private Transform PlayerRightPrefab;
+    [SerializeField] private TextMeshProUGUI Player1Score;
+    [SerializeField] private TextMeshProUGUI Player2Score;
     [SerializeField] private Rigidbody rb;
+
+    private int change;
+    private int player1Score;
+    private int player2Score;
 
     private float yLeft;
     private float zLeft;
@@ -26,7 +35,6 @@ public class BallControl : MonoBehaviour
     private Quaternion handsDownRight;
 
     private bool prepare = true;
-
     private bool IsBallInHandsLeft = true;
     private bool IsBallInHandsRight = false;
 
@@ -40,13 +48,15 @@ public class BallControl : MonoBehaviour
 
     void Update()
     {
-        yLeft = PlayerLeft.eulerAngles.y;
-        zLeft = PlayerLeft.eulerAngles.z;
-        yRight = PlayerLeft.eulerAngles.y;
-        zRight = PlayerLeft.eulerAngles.z;
+        yLeft = PlayerLeftPrefab.eulerAngles.y;
+        zLeft = PlayerLeftPrefab.eulerAngles.z;
+        yRight = PlayerRightPrefab.eulerAngles.y;
+        zRight = PlayerRightPrefab.eulerAngles.z;
 
         if (IsBallInHandsLeft)
         {
+            change=1;
+
             if (Input.GetKey(KeyCode.Tab))
             {
                 if (prepare)
@@ -100,6 +110,8 @@ public class BallControl : MonoBehaviour
 
         if (IsBallInHandsRight)
         {
+            change = 2;
+
             if (Input.GetKey(KeyCode.RightControl))
             {
                 if (prepare)
@@ -114,6 +126,7 @@ public class BallControl : MonoBehaviour
                 if (prepare)
                 {
                     transform.position = BallInHandsRight.position + Vector3.up * Mathf.Abs(Mathf.Sin(Time.time * 5));
+
                     ArmsRight.rotation = Quaternion.Slerp(ArmsRight.rotation, handsDownRight, prepareSpeed * Time.deltaTime);
                 }
             }
@@ -167,6 +180,19 @@ public class BallControl : MonoBehaviour
             {
                 IsBallInHandsRight = true;
                 IsBallInHandsLeft = false;
+            }
+        }
+        if (other.CompareTag("Finish"))
+        {
+            if(change==1)
+            {
+                player1Score++;
+                Player1Score.text = "Score: " + player1Score.ToString();
+            }
+            if (change == 2)
+            {
+                player2Score++;
+                Player2Score.text = "Score: " + player2Score.ToString();
             }
         }
     }
